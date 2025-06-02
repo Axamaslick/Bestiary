@@ -2,6 +2,7 @@ package com.example.bestiary.data.repository
 
 import com.example.bestiary.data.local.database.dao.MonsterDao
 import com.example.bestiary.data.remote.DnDApiService
+import com.example.bestiary.domain.repository.MonsterRepository
 import javax.inject.Inject
 
 // data/repository/MonsterRepositoryImpl.kt
