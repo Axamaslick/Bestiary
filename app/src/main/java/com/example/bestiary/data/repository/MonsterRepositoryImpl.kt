@@ -1,12 +1,18 @@
+// data/repository/MonsterRepositoryImpl.kt
 package com.example.bestiary.data.repository
 
 import com.example.bestiary.data.local.database.dao.MonsterDao
 import com.example.bestiary.data.remote.DnDApiService
+import com.example.bestiary.data.remote.response.toMonster
+import com.example.bestiary.data.remote.response.toMonsterDetail
+import com.example.bestiary.data.remote.response.toMonsterEntity
 import com.example.bestiary.domain.model.Monster
+import com.example.bestiary.domain.model.MonsterDetail
 import com.example.bestiary.domain.repository.MonsterRepository
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.map
 import javax.inject.Inject
 
-// data/repository/MonsterRepositoryImpl.kt
 class MonsterRepositoryImpl @Inject constructor(
     private val apiService: DnDApiService,
     private val monsterDao: MonsterDao
@@ -16,9 +22,17 @@ class MonsterRepositoryImpl @Inject constructor(
         return try {
             val response = apiService.getAllMonsters()
             if (response.isSuccessful) {
-                Result.success(response.body()?.results?.map { it.toMonster() } ?: emptyList())
+                val localMonsters = monsterDao.getAllMonsters()
+                val localMonstersMap = localMonsters.associateBy { it.index }
+
+                val monsters = response.body()?.results?.map { remoteMonster ->
+                    val localMonster = localMonstersMap[remoteMonster.index]
+                    remoteMonster.toMonster(localMonster?.isFavorite ?: false)
+                } ?: emptyList()
+
+                Result.success(monsters)
             } else {
-                Result.failure(Exception("Failed to fetch monsters"))
+                Result.failure(Exception("Failed to fetch monsters: ${response.code()}"))
             }
         } catch (e: Exception) {
             Result.failure(e)
@@ -40,7 +54,7 @@ class MonsterRepositoryImpl @Inject constructor(
                 }
                 Result.success(monsterDetail ?: throw Exception("Monster not found"))
             } else {
-                Result.failure(Exception("Failed to fetch monster details"))
+                Result.failure(Exception("Failed to fetch monster details: ${response.code()}"))
             }
         } catch (e: Exception) {
             Result.failure(e)
@@ -55,14 +69,20 @@ class MonsterRepositoryImpl @Inject constructor(
 
     override suspend fun toggleFavorite(index: String): Result<Boolean> {
         return try {
-            val monster = monsterDao.getMonsterByIndex(index)
-            if (monster != null) {
-                val updatedMonster = monster.copy(isFavorite = !monster.isFavorite)
-                monsterDao.updateMonster(updatedMonster)
-                Result.success(updatedMonster.isFavorite)
-            } else {
-                Result.failure(Exception("Monster not found in local database"))
+            var monster = monsterDao.getMonsterByIndex(index)
+
+            if (monster == null) {
+                // Если монстра нет в БД, сначала загружаем его
+                val response = getMonsterDetail(index)
+                if (response.isFailure) {
+                    return Result.failure(response.exceptionOrNull()!!)
+                }
+                monster = monsterDao.getMonsterByIndex(index)!!
             }
+
+            val updatedMonster = monster.copy(isFavorite = !monster.isFavorite)
+            monsterDao.updateMonster(updatedMonster)
+            Result.success(updatedMonster.isFavorite)
         } catch (e: Exception) {
             Result.failure(e)
         }

@@ -25,4 +25,7 @@ interface MonsterDao {
 
     @Update
     suspend fun updateMonster(monster: MonsterEntity)
+
+    @Query("SELECT * FROM monsters")
+    suspend fun getAllMonsters(): List<MonsterEntity>
 }
