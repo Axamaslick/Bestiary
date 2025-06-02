@@ -2,8 +2,10 @@ package com.example.bestiary.di
 
 import android.content.Context
 import androidx.room.Room
+import com.example.bestiary.data.local.database.AppDatabase
+import com.example.bestiary.data.local.database.dao.MonsterDao
 import com.example.bestiary.data.remote.DnDApiService
-import com.example.bestiary.data.repository.MonsterRepository
+import com.example.bestiary.data.repository.MonsterRepositoryImpl
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -20,7 +22,7 @@ object AppModule {
     fun provideMonsterRepository(
         apiService: DnDApiService,
         monsterDao: MonsterDao
-    ): MonsterRepository = MonsterRepositoryImpl(apiService, monsterDao)
+    ): MonsterRepositoryImpl = MonsterRepositoryImpl(apiService, monsterDao)
 
     @Provides
     @Singleton
