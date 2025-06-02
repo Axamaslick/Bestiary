@@ -1,7 +1,7 @@
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
-
+    id "androidx.navigation.safeargs.kotlin" version "2.7.7"
     id 'kotlin-kapt'
 
 }
@@ -99,4 +99,6 @@ dependencies {
     // OkHttp и Logging Interceptor
     implementation "com.squareup.okhttp3:okhttp:4.9.3"
     implementation "com.squareup.okhttp3:logging-interceptor:4.9.3"
+
+
 }

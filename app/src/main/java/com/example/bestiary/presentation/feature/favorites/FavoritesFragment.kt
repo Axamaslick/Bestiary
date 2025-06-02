@@ -9,8 +9,12 @@ import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.GridLayoutManager
+import com.example.bestiary.databinding.FragmentFavoritesBinding
 import com.example.bestiary.domain.model.Monster
+import com.example.bestiary.presentation.common.adapter.MonsterAdapter
+import com.example.bestiary.presentation.common.decorations.GridSpacingItemDecoration
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.launch
 
 
 @AndroidEntryPoint
