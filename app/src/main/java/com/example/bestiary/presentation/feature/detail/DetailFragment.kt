@@ -9,6 +9,8 @@ import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
+import com.example.bestiary.R
+import com.example.bestiary.domain.model.MonsterDetail
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 

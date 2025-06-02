@@ -9,6 +9,7 @@ import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.GridLayoutManager
+import com.example.bestiary.R
 import com.example.bestiary.databinding.FragmentFavoritesBinding
 import com.example.bestiary.domain.model.Monster
 import com.example.bestiary.presentation.common.adapter.MonsterAdapter
@@ -59,7 +60,7 @@ class FavoritesFragment : Fragment() {
             addItemDecoration(
                 GridSpacingItemDecoration(
                     spanCount = 2,
-                    spacing = resources.getDimensionPixelSize(R.dimen.grid_spacing),
+                    spacing = resources.getDimensionPixelSize(R.dimens.grid_spacing),
                     includeEdge = true
                 )
             )

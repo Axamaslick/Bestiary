@@ -1,6 +1,7 @@
 package com.example.bestiary.presentation.navigation
 
 import androidx.navigation.NavController
+import com.example.bestiary.R
 
 fun NavController.navigateToSearch() {
     navigate(R.id.searchFragment) {
