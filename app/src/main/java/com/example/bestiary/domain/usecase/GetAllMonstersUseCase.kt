@@ -1,6 +1,9 @@
 package com.example.bestiary.domain.usecase
 
+import com.example.bestiary.domain.model.Monster
+import com.example.bestiary.domain.model.MonsterDetail
 import com.example.bestiary.domain.repository.MonsterRepository
+import kotlinx.coroutines.flow.Flow
 import javax.inject.Inject
 
 // domain/usecase/GetAllMonstersUseCase.kt
