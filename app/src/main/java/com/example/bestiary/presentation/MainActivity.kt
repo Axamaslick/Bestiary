@@ -7,6 +7,7 @@ import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.navigation.NavController
 import androidx.navigation.fragment.NavHostFragment
+import androidx.navigation.ui.setupWithNavController
 import com.example.bestiary.R
 import com.example.bestiary.databinding.ActivityMainBinding
 import com.example.bestiary.presentation.navigation.navigateToFavorites

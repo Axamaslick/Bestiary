@@ -40,11 +40,3 @@ class MonsterSearchAdapter(
         }
     }
 }
-
-class MonsterDiffCallback : DiffUtil.ItemCallback<Monster>() {
-    override fun areItemsTheSame(oldItem: Monster, newItem: Monster): Boolean =
-        oldItem.index == newItem.index
-
-    override fun areContentsTheSame(oldItem: Monster, newItem: Monster): Boolean =
-        oldItem == newItem
-}

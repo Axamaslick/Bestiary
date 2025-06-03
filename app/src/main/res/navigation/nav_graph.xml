@@ -34,4 +34,15 @@
             android:name="monsterIndex"
             app:argType="string" />
     </fragment>
+
+    <fragment
+        android:id="@+id/searchFragment"
+        android:name="com.example.bestiary.presentation.feature.search.SearchFragment"
+        android:label="Search"
+        tools:ignore="DuplicateIds">
+
+        <action
+            android:id="@+id/action_search_to_detail"
+            app:destination="@id/detailFragment" />
+    </fragment>
 </navigation>

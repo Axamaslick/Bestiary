@@ -7,6 +7,7 @@ import android.view.ViewGroup
 import android.widget.SearchView
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -14,6 +15,7 @@ import com.example.bestiary.util.Resource
 import com.example.bestiary.databinding.FragmentSearchBinding
 import com.example.bestiary.presentation.common.adapter.MonsterSearchAdapter
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.launch
 
 @AndroidEntryPoint
 class SearchFragment : Fragment() {
@@ -74,22 +76,26 @@ class SearchFragment : Fragment() {
     }
 
     private fun observeViewModel() {
-        viewModel.monsters.observe(viewLifecycleOwner) { result ->
-            when (result) {
-                is Resource.Loading -> showLoading()
-                is Resource.Success -> {
-                    hideLoading()
-                    adapter.submitList(result.data)
-                }
-                is Resource.Error -> {
-                    hideLoading()
-                    showError(result.message)
+        viewLifecycleOwner.lifecycleScope.launch {
+            viewModel.monsters.collect { result ->
+                when (result) {
+                    is Resource.Loading -> showLoading()
+                    is Resource.Success -> {
+                        hideLoading()
+                        result.data?.let { adapter.submitList(it) }
+                    }
+                    is Resource.Error -> {
+                        hideLoading()
+                        showError(result.message ?: "Unknown error")
+                    }
                 }
             }
         }
 
-        viewModel.filteredMonsters.observe(viewLifecycleOwner) { filtered ->
-            adapter.submitList(filtered)
+        viewLifecycleOwner.lifecycleScope.launch {
+            viewModel.filteredMonsters.collect { filtered ->
+                adapter.submitList(filtered)
+            }
         }
     }
 
