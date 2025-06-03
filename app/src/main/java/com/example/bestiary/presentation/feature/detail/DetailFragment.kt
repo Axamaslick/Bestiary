@@ -9,6 +9,7 @@ import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
+import com.bumptech.glide.Glide
 import com.example.bestiary.R
 import com.example.bestiary.databinding.FragmentDetailBinding
 import com.example.bestiary.domain.model.MonsterDetail

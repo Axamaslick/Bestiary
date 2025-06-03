@@ -96,5 +96,9 @@ dependencies {
     implementation "com.squareup.okhttp3:okhttp:4.9.3"
     implementation "com.squareup.okhttp3:logging-interceptor:4.9.3"
 
+    // Material Components (для AppBar, FAB и др.)
+    implementation 'com.google.android.material:material:1.6.0'
 
+    // AppCompat (для Toolbar)
+    implementation 'androidx.appcompat:appcompat:1.4.2'
 }

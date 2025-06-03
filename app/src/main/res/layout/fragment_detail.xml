@@ -73,7 +73,7 @@
         android:layout_height="wrap_content"
         android:layout_margin="16dp"
         android:src="@drawable/ic_favorite_outline"
-        app:layout_anchor="@id/appbar"
+        app:layout_anchor="@id/toolbar"
         app:layout_anchorGravity="bottom|right|end" />
 
     <ProgressBar
@@ -83,5 +83,7 @@
         android:layout_height="wrap_content"
         android:layout_gravity="center"
         android:visibility="gone" />
+
+
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>
