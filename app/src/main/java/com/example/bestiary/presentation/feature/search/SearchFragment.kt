@@ -10,8 +10,9 @@ import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.bumptech.glide.load.engine.Resource
+import com.example.bestiary.util.Resource
 import com.example.bestiary.databinding.FragmentSearchBinding
+import com.example.bestiary.presentation.common.adapter.MonsterSearchAdapter
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint

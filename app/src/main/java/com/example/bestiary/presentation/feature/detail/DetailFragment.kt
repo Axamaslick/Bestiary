@@ -13,6 +13,8 @@ import com.bumptech.glide.Glide
 import com.example.bestiary.R
 import com.example.bestiary.databinding.FragmentDetailBinding
 import com.example.bestiary.domain.model.MonsterDetail
+import com.example.bestiary.presentation.common.adapter.AbilityAdapter
+import com.example.bestiary.presentation.common.adapter.ActionAdapter
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 

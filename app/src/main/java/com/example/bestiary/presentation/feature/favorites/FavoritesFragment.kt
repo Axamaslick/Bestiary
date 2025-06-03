@@ -60,7 +60,7 @@ class FavoritesFragment : Fragment() {
             addItemDecoration(
                 GridSpacingItemDecoration(
                     spanCount = 2,
-                    spacing = resources.getDimensionPixelSize(R.dimens.grid_spacing),
+                    spacing = resources.getDimensionPixelSize(R.dimen.grid_spacing),
                     includeEdge = true
                 )
             )
