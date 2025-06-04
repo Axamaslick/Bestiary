@@ -77,8 +77,17 @@ class SearchFragment : Fragment() {
 
     private fun observeViewModel() {
         viewLifecycleOwner.lifecycleScope.launch {
-            viewModel.searchResults.collect { results ->
-                adapter.submitList(results)
+            viewModel.searchResults.collect { resource ->
+                when (resource) {
+                    is Resource.Loading -> showLoading()
+                    is Resource.Success -> {
+                        hideLoading()
+                        adapter.submitList(resource.data)
+                    }
+                    is Resource.Error -> {
+                        showError(resource.message ?: "Unknown error")
+                    }
+                }
             }
         }
     }
