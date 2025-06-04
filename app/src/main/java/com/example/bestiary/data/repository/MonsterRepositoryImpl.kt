@@ -16,14 +16,23 @@ import javax.inject.Inject
 
 class MonsterRepositoryImpl @Inject constructor(
     private val apiService: DnDApiService,
-    private val monsterDao: MonsterDao
+    private val monsterDao: MonsterDao,
+
+
+
 ) : MonsterRepository {
+
+    private var cachedMonsters: List<Monster>? = null
 
     private companion object {
         const val TAG = "MonsterRepository"
     }
 
     override suspend fun getAllMonsters(): Result<List<Monster>> {
+
+        cachedMonsters?.let {
+            return Result.success(it)
+        }
         return try {
             Log.d(TAG, "Fetching all monsters from API")
             val response = apiService.getAllMonsters()
@@ -41,13 +50,13 @@ class MonsterRepositoryImpl @Inject constructor(
 
             val localMonsters = monsterDao.getAllMonsters()
             val monsters = localMonsters.map { it.toMonster() }
-
-            Log.d(TAG, "Successfully fetched ${monsters.size} monsters")
+            cachedMonsters = monsters // Сохраняем в кэш ДО возврата результата
             Result.success(monsters)
         } catch (e: Exception) {
             Log.e(TAG, "Error fetching monsters", e)
             Result.failure(e)
         }
+
     }
 
     override suspend fun getMonsterDetail(index: String): Result<MonsterDetail> {
@@ -92,26 +101,19 @@ class MonsterRepositoryImpl @Inject constructor(
         return try {
             Log.d(TAG, "Toggling favorite for monster: $index")
 
-            var monster = monsterDao.getMonsterByIndex(index)
+            // Получаем текущее состояние из БД
+            val monster = monsterDao.getMonsterByIndex(index)
+                ?: return Result.failure(Exception("Monster not found"))
 
-            if (monster == null) {
-                // Если монстра нет в БД, сначала загружаем его
-                Log.d(TAG, "Monster not in DB, fetching from API")
-                val response = getMonsterDetail(index)
+            // Инвертируем статус
+            val newFavoriteStatus = !monster.isFavorite
+            val updatedMonster = monster.copy(isFavorite = newFavoriteStatus)
 
-                if (response.isFailure) {
-                    return Result.failure(response.exceptionOrNull()!!)
-                }
-
-                monster = monsterDao.getMonsterByIndex(index)
-                    ?: return Result.failure(Exception("Failed to save monster to DB"))
-            }
-
-            val updatedMonster = monster.copy(isFavorite = !monster.isFavorite)
+            // Обновляем в БД
             monsterDao.updateMonster(updatedMonster)
 
-            Log.d(TAG, "Favorite status toggled to ${updatedMonster.isFavorite}")
-            Result.success(updatedMonster.isFavorite)
+            Log.d(TAG, "Favorite status toggled to $newFavoriteStatus")
+            Result.success(newFavoriteStatus)
         } catch (e: Exception) {
             Log.e(TAG, "Error toggling favorite", e)
             Result.failure(e)

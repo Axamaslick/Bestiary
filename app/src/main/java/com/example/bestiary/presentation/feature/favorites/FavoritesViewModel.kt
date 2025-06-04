@@ -43,9 +43,10 @@ class FavoritesViewModel @Inject constructor(
     fun toggleFavorite(index: String) {
         viewModelScope.launch {
             toggleFavoriteUseCase(index).onSuccess { isFavorite ->
-                if (!isFavorite) {
-                    loadFavorites() // Refresh the list after removing a favorite
-                }
+                // Не нужно вызывать loadFavorites() - Flow автоматически обновится
+                // так как мы используем Room с Flow
+            }.onFailure { e ->
+                // Обработка ошибки, если нужно
             }
         }
     }
