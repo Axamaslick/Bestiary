@@ -1,4 +1,3 @@
-// presentation/common/adapter/AbilityAdapter.kt
 package com.example.bestiary.presentation.common.adapter
 
 import android.view.LayoutInflater
@@ -34,6 +33,7 @@ class AbilityAdapter : ListAdapter<SpecialAbility, AbilityAdapter.AbilityViewHol
             }
         }
     }
+
 }
 
 class AbilityDiffCallback : DiffUtil.ItemCallback<SpecialAbility>() {
@@ -43,3 +43,4 @@ class AbilityDiffCallback : DiffUtil.ItemCallback<SpecialAbility>() {
     override fun areContentsTheSame(oldItem: SpecialAbility, newItem: SpecialAbility): Boolean =
         oldItem == newItem
 }
+

@@ -20,7 +20,7 @@ interface MonsterDao {
     @Query("SELECT * FROM monsters WHERE isFavorite = 1")
     fun getFavoriteMonsters(): Flow<List<MonsterEntity>>
 
-    @Query("SELECT * FROM monsters WHERE index = :index")
+    @Query("SELECT * FROM monsters WHERE `index` = :index") // Обратные кавычки вокруг index
     suspend fun getMonsterByIndex(index: String): MonsterEntity?
 
     @Update

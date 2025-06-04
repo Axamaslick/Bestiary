@@ -1,4 +1,3 @@
-// presentation/common/adapter/ActionAdapter.kt
 package com.example.bestiary.presentation.common.adapter
 
 import android.view.LayoutInflater
@@ -42,9 +41,9 @@ class ActionAdapter : ListAdapter<MonsterAction, ActionAdapter.ActionViewHolder>
                 }
 
                 if (!action.damage.isNullOrEmpty()) {
-                    textDamage.text = action.damage.joinToString {
+                    textDamage.text = action.damage?.joinToString {
                         "${it.damageDice} (${it.damageType})"
-                    }
+                    } ?: ""
                     textDamage.visibility = View.VISIBLE
                 } else {
                     textDamage.visibility = View.GONE

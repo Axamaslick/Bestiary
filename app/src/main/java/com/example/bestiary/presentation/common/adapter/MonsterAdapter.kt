@@ -39,7 +39,7 @@ class MonsterAdapter(
                 challengeRating.text = "CR: ${monster.challengeRating}"
 
                 Glide.with(root.context)
-                    .load(monster.imageUrl)
+                    .load(monster.imageUrl?.takeIf { it.isNotBlank() })
                     .placeholder(R.drawable.ic_monster_placeholder)
                     .into(image)
 

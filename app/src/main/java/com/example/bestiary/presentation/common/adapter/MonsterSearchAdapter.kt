@@ -1,4 +1,3 @@
-// presentation/common/adapter/MonsterSearchAdapter.kt
 package com.example.bestiary.presentation.common.adapter
 
 import android.view.LayoutInflater
@@ -39,4 +38,7 @@ class MonsterSearchAdapter(
             }
         }
     }
+
+
 }
+
