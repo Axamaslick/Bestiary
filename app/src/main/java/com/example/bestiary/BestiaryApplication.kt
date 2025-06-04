@@ -4,4 +4,9 @@ import android.app.Application
 import dagger.hilt.android.HiltAndroidApp
 
 @HiltAndroidApp
-class BestiaryApplication : Application()
+class BestiaryApplication : Application() {
+    override fun onCreate() {
+        super.onCreate()
+        // Инициализация (если требуется)
+    }
+}

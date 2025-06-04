@@ -1,6 +1,7 @@
 // data/repository/MonsterRepositoryImpl.kt
 package com.example.bestiary.data.repository
 
+import android.util.Log
 import com.example.bestiary.data.local.database.dao.MonsterDao
 import com.example.bestiary.data.remote.DnDApiService
 import com.example.bestiary.data.remote.response.toMonster
@@ -18,72 +19,102 @@ class MonsterRepositoryImpl @Inject constructor(
     private val monsterDao: MonsterDao
 ) : MonsterRepository {
 
+    private companion object {
+        const val TAG = "MonsterRepository"
+    }
+
     override suspend fun getAllMonsters(): Result<List<Monster>> {
         return try {
+            Log.d(TAG, "Fetching all monsters from API")
             val response = apiService.getAllMonsters()
-            if (response.isSuccessful) {
-                val localMonsters = monsterDao.getAllMonsters()
-                val localMonstersMap = localMonsters.associateBy { it.index }
 
-                val monsters = response.body()?.results?.map { remoteMonster ->
-                    val localMonster = localMonstersMap[remoteMonster.index]
-                    remoteMonster.toMonster(localMonster?.isFavorite ?: false)
-                } ?: emptyList()
-
-                Result.success(monsters)
-            } else {
-                Result.failure(Exception("Failed to fetch monsters: ${response.code()}"))
+            if (!response.isSuccessful) {
+                Log.e(TAG, "API request failed: ${response.code()}")
+                return Result.failure(Exception("API request failed"))
             }
+
+            val remoteMonsters = response.body()?.results ?: emptyList()
+            val localMonsters = monsterDao.getAllMonsters()
+            val localMonstersMap = localMonsters.associateBy { it.index }
+
+            val monsters = remoteMonsters.map { remoteMonster ->
+                remoteMonster.toMonster(
+                    isFavorite = localMonstersMap[remoteMonster.index]?.isFavorite ?: false
+                )
+            }
+
+            Log.d(TAG, "Successfully fetched ${monsters.size} monsters")
+            Result.success(monsters)
         } catch (e: Exception) {
+            Log.e(TAG, "Error fetching monsters", e)
             Result.failure(e)
         }
     }
 
     override suspend fun getMonsterDetail(index: String): Result<MonsterDetail> {
         return try {
-            val localMonster = monsterDao.getMonsterByIndex(index)
-            if (localMonster != null) {
+            Log.d(TAG, "Fetching monster details for index: $index")
+
+            // Сначала проверяем локальную БД
+            monsterDao.getMonsterByIndex(index)?.let { localMonster ->
+                Log.d(TAG, "Found monster in local database")
                 return Result.success(localMonster.toMonsterDetail())
             }
 
+            // Если нет в БД, запрашиваем с API
             val response = apiService.getMonsterByIndex(index)
-            if (response.isSuccessful) {
-                val monsterDetail = response.body()?.toMonsterDetail()
-                if (monsterDetail != null) {
-                    monsterDao.insertMonster(monsterDetail.toMonsterEntity())
-                }
-                Result.success(monsterDetail ?: throw Exception("Monster not found"))
-            } else {
-                Result.failure(Exception("Failed to fetch monster details: ${response.code()}"))
+            if (!response.isSuccessful) {
+                Log.e(TAG, "API request failed: ${response.code()}")
+                return Result.failure(Exception("Monster not found"))
             }
+
+            val monsterDetail = response.body()?.toMonsterDetail()
+                ?: return Result.failure(Exception("Invalid response format"))
+
+            // Сохраняем в БД для будущих запросов
+            monsterDao.insertMonster(monsterDetail.toMonsterEntity())
+            Log.d(TAG, "Saved monster to local database")
+
+            Result.success(monsterDetail)
         } catch (e: Exception) {
+            Log.e(TAG, "Error fetching monster details", e)
             Result.failure(e)
         }
     }
 
     override fun getFavoriteMonsters(): Flow<List<Monster>> {
-        return monsterDao.getFavoriteMonsters().map { list ->
-            list.map { it.toMonster() }
-        }
+        return monsterDao.getFavoriteMonsters()
+            .map { favorites ->
+                favorites.map { it.toMonster() }
+            }
     }
 
     override suspend fun toggleFavorite(index: String): Result<Boolean> {
         return try {
+            Log.d(TAG, "Toggling favorite for monster: $index")
+
             var monster = monsterDao.getMonsterByIndex(index)
 
             if (monster == null) {
                 // Если монстра нет в БД, сначала загружаем его
+                Log.d(TAG, "Monster not in DB, fetching from API")
                 val response = getMonsterDetail(index)
+
                 if (response.isFailure) {
                     return Result.failure(response.exceptionOrNull()!!)
                 }
-                monster = monsterDao.getMonsterByIndex(index)!!
+
+                monster = monsterDao.getMonsterByIndex(index)
+                    ?: return Result.failure(Exception("Failed to save monster to DB"))
             }
 
             val updatedMonster = monster.copy(isFavorite = !monster.isFavorite)
             monsterDao.updateMonster(updatedMonster)
+
+            Log.d(TAG, "Favorite status toggled to ${updatedMonster.isFavorite}")
             Result.success(updatedMonster.isFavorite)
         } catch (e: Exception) {
+            Log.e(TAG, "Error toggling favorite", e)
             Result.failure(e)
         }
     }
