@@ -34,14 +34,13 @@ class MonsterRepositoryImpl @Inject constructor(
             }
 
             val remoteMonsters = response.body()?.results ?: emptyList()
-            val localMonsters = monsterDao.getAllMonsters()
-            val localMonstersMap = localMonsters.associateBy { it.index }
 
-            val monsters = remoteMonsters.map { remoteMonster ->
-                remoteMonster.toMonster(
-                    isFavorite = localMonstersMap[remoteMonster.index]?.isFavorite ?: false
-                )
-            }
+            // Сохраняем всех монстров в БД
+            val entities = remoteMonsters.map { it.toMonsterEntity() }
+            monsterDao.insertMonsters(entities)
+
+            val localMonsters = monsterDao.getAllMonsters()
+            val monsters = localMonsters.map { it.toMonster() }
 
             Log.d(TAG, "Successfully fetched ${monsters.size} monsters")
             Result.success(monsters)
@@ -121,6 +120,9 @@ class MonsterRepositoryImpl @Inject constructor(
 
     override fun searchMonsters(query: String): Flow<List<Monster>> {
         return monsterDao.searchMonsters(query)
-            .map { entities -> entities.map { it.toMonster() } }
+            .map { entities ->
+                Log.d("SEARCH_DEBUG", "Found ${entities.size} entities for query: $query")
+                entities.map { it.toMonster() }
+            }
     }
 }

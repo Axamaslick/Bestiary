@@ -41,8 +41,8 @@ class SearchFragment : Fragment() {
         setupRecyclerView()
         observeViewModel()
 
-        if (viewModel.monsters.value == null) {
-            viewModel.loadAllMonsters()
+        if (viewModel.searchState.value is Resource.Loading) {
+            viewModel.loadInitialData()
         }
     }
 
@@ -77,7 +77,7 @@ class SearchFragment : Fragment() {
 
     private fun observeViewModel() {
         viewLifecycleOwner.lifecycleScope.launch {
-            viewModel.searchResults.collect { resource ->
+            viewModel.searchState.collect { resource ->
                 when (resource) {
                     is Resource.Loading -> showLoading()
                     is Resource.Success -> {
@@ -86,6 +86,7 @@ class SearchFragment : Fragment() {
                     }
                     is Resource.Error -> {
                         showError(resource.message ?: "Unknown error")
+                        adapter.submitList(emptyList())
                     }
                 }
             }

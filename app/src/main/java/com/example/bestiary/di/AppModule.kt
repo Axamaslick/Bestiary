@@ -39,7 +39,13 @@ object DatabaseModule {
             appContext,
             AppDatabase::class.java,
             "bestiary.db"
-        ).build()
+        )
+            .addMigrations(
+                AppDatabase.MIGRATION_1_2,
+                AppDatabase.MIGRATION_2_3
+            )
+            .fallbackToDestructiveMigrationOnDowngrade()
+            .build()
     }
 
     @Provides
