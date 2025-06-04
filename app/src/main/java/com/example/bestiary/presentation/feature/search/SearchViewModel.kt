@@ -7,6 +7,7 @@ import com.example.bestiary.domain.model.Monster
 import com.example.bestiary.domain.repository.MonsterRepository
 import com.example.bestiary.util.Resource
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -45,6 +46,33 @@ class SearchViewModel @Inject constructor(
         } else {
             currentMonsters.filter { monster ->
                 monster.name.contains(query, ignoreCase = true)
+            }
+        }
+    }
+
+    // presentation/feature/search/SearchViewModel.kt
+    private val _searchQuery = MutableStateFlow("")
+    val searchQuery: StateFlow<String> = _searchQuery.asStateFlow()
+
+    private val _searchResults = MutableStateFlow<Resource<List<Monster>>>(Resource.Success(emptyList()))
+    val searchResults: StateFlow<Resource<List<Monster>>> = _searchResults.asStateFlow()
+
+    fun onSearchQueryChanged(query: String) {
+        _searchQuery.value = query
+        viewModelScope.launch {
+            if (query.length >= 2) {
+                _searchResults.value = Resource.Loading()
+                try {
+                    delay(300)
+                    repository.searchMonsters(query)
+                        .collect { results ->
+                            _searchResults.value = Resource.Success(results)
+                        }
+                } catch (e: Exception) {
+                    _searchResults.value = Resource.Error(e.message ?: "Search failed")
+                }
+            } else {
+                _searchResults.value = Resource.Success(emptyList())
             }
         }
     }

@@ -38,4 +38,7 @@ interface MonsterDao {
     @Transaction
     @Query("SELECT * FROM monsters WHERE `index` = :index")
     suspend fun getMonsterWithDetails(index: String): MonsterEntity?
+
+    @Query("SELECT * FROM monsters WHERE name LIKE '%' || :query || '%' LIMIT 50")
+    fun searchMonsters(query: String): Flow<List<MonsterEntity>>
 }

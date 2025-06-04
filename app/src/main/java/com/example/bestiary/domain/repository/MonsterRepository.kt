@@ -12,4 +12,5 @@ interface MonsterRepository {
     suspend fun getMonsterDetail(index: String): Result<MonsterDetail>
     fun getFavoriteMonsters(): Flow<List<Monster>>
     suspend fun toggleFavorite(index: String): Result<Boolean>
+    fun searchMonsters(query: String): Flow<List<Monster>>
 }

@@ -118,4 +118,9 @@ class MonsterRepositoryImpl @Inject constructor(
             Result.failure(e)
         }
     }
+
+    override fun searchMonsters(query: String): Flow<List<Monster>> {
+        return monsterDao.searchMonsters(query)
+            .map { entities -> entities.map { it.toMonster() } }
+    }
 }

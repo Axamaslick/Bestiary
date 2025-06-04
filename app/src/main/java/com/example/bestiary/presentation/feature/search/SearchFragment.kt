@@ -53,7 +53,7 @@ class SearchFragment : Fragment() {
             }
 
             override fun onQueryTextChange(newText: String?): Boolean {
-                viewModel.filterMonsters(newText.orEmpty())
+                viewModel.onSearchQueryChanged(newText.orEmpty())
                 return true
             }
         })
@@ -77,24 +77,8 @@ class SearchFragment : Fragment() {
 
     private fun observeViewModel() {
         viewLifecycleOwner.lifecycleScope.launch {
-            viewModel.monsters.collect { result ->
-                when (result) {
-                    is Resource.Loading -> showLoading()
-                    is Resource.Success -> {
-                        hideLoading()
-                        result.data?.let { adapter.submitList(it) }
-                    }
-                    is Resource.Error -> {
-                        hideLoading()
-                        showError(result.message ?: "Unknown error")
-                    }
-                }
-            }
-        }
-
-        viewLifecycleOwner.lifecycleScope.launch {
-            viewModel.filteredMonsters.collect { filtered ->
-                adapter.submitList(filtered)
+            viewModel.searchResults.collect { results ->
+                adapter.submitList(results)
             }
         }
     }

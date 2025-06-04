@@ -1,9 +1,10 @@
 package com.example.bestiary.data.local.database.entity
 
 import androidx.room.Entity
+import androidx.room.Index
 import androidx.room.PrimaryKey
 
-@Entity(tableName = "monsters")
+@Entity(tableName = "monsters", indices = [Index(value = ["name"], unique = false)])
 data class MonsterEntity(
     @PrimaryKey val index: String,
     val name: String,
