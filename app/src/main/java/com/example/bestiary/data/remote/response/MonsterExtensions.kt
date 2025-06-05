@@ -24,37 +24,38 @@ fun MonsterDetailResponse.toMonsterDetail(isFavorite: Boolean = false): MonsterD
     size = size,
     type = type,
     alignment = alignment,
-    armorClass = armor_class,
-    hitPoints = hit_points,
-    hitDice = hit_dice,
+    armorClass = armorClass.firstOrNull()?.value ?: 0,  // Используем camelCase и берём значение из списка
+    hitPoints = hitPoints,
+    hitDice = hitDice,
     strength = strength,
     dexterity = dexterity,
     constitution = constitution,
     intelligence = intelligence,
     wisdom = wisdom,
     charisma = charisma,
-    challengeRating = challenge_rating,
-    xp = xp,
-    specialAbilities = special_abilities?.map {
+    challengeRating = challengeRating,
+    xp = xp ?: 0,
+    specialAbilities = specialAbilities?.map {
         SpecialAbility(it.name, it.desc)
     },
     actions = actions?.map {
         MonsterAction(
             name = it.name,
             desc = it.desc,
-            attackBonus = it.attack_bonus,
+            attackBonus = it.attackBonus,
             damage = it.damage?.map { damage ->
                 ActionDamage(
-                    damageType = damage.damage_type.name,
-                    damageDice = damage.damage_dice
+                    damageType = damage.damageType.name,
+                    damageDice = damage.damageDice
                 )
             }
         )
     },
-    imageUrl = image,
+    imageUrl = image?.let { "https://www.dnd5eapi.co$it" },  // Формируем полный URL
     description = desc,
     isFavorite = isFavorite
 )
+
 
 fun MonsterDetail.toMonsterEntity(): MonsterEntity = MonsterEntity(
     index = index,

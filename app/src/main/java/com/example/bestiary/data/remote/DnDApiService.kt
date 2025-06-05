@@ -9,10 +9,10 @@ import retrofit2.http.Path
 import retrofit2.http.Url
 
 interface DnDApiService {
-    @GET("api/2014/monsters")
+    @GET("api/2014/monsters/")
     suspend fun getAllMonsters(): Response<MonsterListResponse>
 
-    @GET("api/2014/monsters/{index}")
+    @GET("api/2014/monsters/{index}/")
     suspend fun getMonsterByIndex(@Path("index") index: String): Response<MonsterDetailResponse>
 
     @GET

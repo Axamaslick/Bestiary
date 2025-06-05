@@ -1,16 +1,26 @@
+// data/remote/response/MonsterDetailResponse.kt
 package com.example.bestiary.data.remote.response
 
-// data/remote/response/MonsterDetailResponse.kt
+import com.squareup.moshi.Json
+
+data class ArmorClassResponse(
+    val type: String?,
+    val value: Int
+)
+
 data class MonsterDetailResponse(
     val index: String,
     val name: String,
     val size: String,
     val type: String,
     val alignment: String,
-    val armor_class: Int,
-    val hit_points: Int,
-    val hit_dice: String,
-    val speed: Map<String, Int?>,
+    @Json(name = "armor_class")
+    val armorClass: List<ArmorClassResponse>,
+    @Json(name = "hit_points")
+    val hitPoints: Int,
+    @Json(name = "hit_dice")
+    val hitDice: String,
+    val speed: Map<String, String?>?, // Изменено на String?
     val strength: Int,
     val dexterity: Int,
     val constitution: Int,
@@ -18,17 +28,21 @@ data class MonsterDetailResponse(
     val wisdom: Int,
     val charisma: Int,
     val proficiencies: List<Proficiency>,
-    val damage_vulnerabilities: List<String>,
-    val damage_resistances: List<String>,
-    val damage_immunities: List<String>,
-    val condition_immunities: List<ConditionImmunity>,
-    val senses: Map<String, String?>,
-    val languages: String,
-    val challenge_rating: Float,
-    val xp: Int,
-    val special_abilities: List<SpecialAbility>?,
+    val damage_vulnerabilities: List<String>?,
+    val damage_resistances: List<String>?,
+    val damage_immunities: List<String>?,
+    val condition_immunities: List<ConditionImmunity>?,
+    val senses: Map<String, String?>?, // Изменено на String?
+    val languages: String?, // Может быть null
+    @Json(name = "challenge_rating")
+    val challengeRating: Float,
+    val xp: Int?, // Может быть null
+    @Json(name = "special_abilities")
+    val specialAbilities: List<SpecialAbility>?,
     val actions: List<MonsterAction>?,
-    val legendary_actions: List<MonsterAction>?,
+    @Json(name = "legendary_actions")
+    val legendaryActions: List<MonsterAction>?,
+    @Json(name = "image")
     val image: String?,
     val desc: String?
 )
@@ -58,13 +72,16 @@ data class SpecialAbility(
 data class MonsterAction(
     val name: String,
     val desc: String,
-    val attack_bonus: Int?,
+    @Json(name = "attack_bonus")
+    val attackBonus: Int?,
     val damage: List<ActionDamage>?
 )
 
 data class ActionDamage(
-    val damage_type: DamageType,
-    val damage_dice: String
+    @Json(name = "damage_type")
+    val damageType: DamageType,
+    @Json(name = "damage_dice")
+    val damageDice: String
 )
 
 data class DamageType(
@@ -72,3 +89,4 @@ data class DamageType(
     val name: String,
     val url: String
 )
+

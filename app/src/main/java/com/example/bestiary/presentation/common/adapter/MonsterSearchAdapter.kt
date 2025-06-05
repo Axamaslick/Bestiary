@@ -1,5 +1,6 @@
 package com.example.bestiary.presentation.common.adapter
 
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
@@ -36,6 +37,7 @@ class MonsterSearchAdapter(
 
                 root.setOnClickListener { onItemClick(monster) }
             }
+            Log.d("MonsterSearchAdapter", "Bind monster: $monster")
         }
     }
 

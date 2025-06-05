@@ -1,6 +1,8 @@
+// presentation/feature/detail/DetailFragment.kt
 package com.example.bestiary.presentation.feature.detail
 
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -25,6 +27,10 @@ class DetailFragment : Fragment() {
     private val binding get() = _binding!!
     private val args: DetailFragmentArgs by navArgs()
     private val viewModel: DetailViewModel by viewModels()
+
+    private companion object {
+        const val TAG = "DetailFragment"
+    }
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -55,7 +61,10 @@ class DetailFragment : Fragment() {
                 when (state) {
                     is DetailState.Loading -> showLoading()
                     is DetailState.Error -> showError(state.message)
-                    is DetailState.Success -> showMonsterDetail(state.monster)
+                    is DetailState.Success -> {
+                        Log.d(TAG, "Received DetailState.Success: ${state.monster}") // Логируем полученный объект
+                        showMonsterDetail(state.monster)
+                    }
                 }
             }
         }
@@ -90,9 +99,12 @@ class DetailFragment : Fragment() {
 
         with(binding) {
             toolbar.title = monster.name
+            val fullImageUrl = monster.imageUrl
+            Log.d(TAG, "Loading image with URL: $fullImageUrl") // Логируем URL
             Glide.with(requireContext())
-                .load(monster.imageUrl)
+                .load(fullImageUrl)
                 .placeholder(R.drawable.ic_monster_placeholder)
+                .error(R.drawable.ic_error) // Добавили обработку ошибок
                 .into(imageMonster)
 
             textName.text = monster.name

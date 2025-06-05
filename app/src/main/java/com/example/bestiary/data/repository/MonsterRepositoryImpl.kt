@@ -4,6 +4,7 @@ package com.example.bestiary.data.repository
 import android.util.Log
 import com.example.bestiary.data.local.database.dao.MonsterDao
 import com.example.bestiary.data.remote.DnDApiService
+import com.example.bestiary.data.remote.response.MonsterDetailResponse
 import com.example.bestiary.data.remote.response.toMonster
 import com.example.bestiary.data.remote.response.toMonsterDetail
 import com.example.bestiary.data.remote.response.toMonsterEntity
@@ -16,10 +17,7 @@ import javax.inject.Inject
 
 class MonsterRepositoryImpl @Inject constructor(
     private val apiService: DnDApiService,
-    private val monsterDao: MonsterDao,
-
-
-
+    private val monsterDao: MonsterDao
 ) : MonsterRepository {
 
     private var cachedMonsters: List<Monster>? = null
@@ -29,7 +27,6 @@ class MonsterRepositoryImpl @Inject constructor(
     }
 
     override suspend fun getAllMonsters(): Result<List<Monster>> {
-
         cachedMonsters?.let {
             return Result.success(it)
         }
@@ -56,32 +53,34 @@ class MonsterRepositoryImpl @Inject constructor(
             Log.e(TAG, "Error fetching monsters", e)
             Result.failure(e)
         }
-
     }
 
     override suspend fun getMonsterDetail(index: String): Result<MonsterDetail> {
         return try {
             Log.d(TAG, "Fetching monster details for index: $index")
 
-            // Сначала проверяем локальную БД
-            monsterDao.getMonsterByIndex(index)?.let { localMonster ->
-                Log.d(TAG, "Found monster in local database")
+            // Сначала пробуем получить из локальной базы
+            val localMonster = monsterDao.getMonsterByIndex(index)
+            if (localMonster != null && localMonster.hitPoints != 0) {
+                Log.d(TAG, "Found monster in local database with data")
                 return Result.success(localMonster.toMonsterDetail())
             }
 
-            // Если нет в БД, запрашиваем с API
+            // Если нет данных или данные пустые — делаем запрос к API
             val response = apiService.getMonsterByIndex(index)
             if (!response.isSuccessful) {
                 Log.e(TAG, "API request failed: ${response.code()}")
                 return Result.failure(Exception("Monster not found"))
             }
 
-            val monsterDetail = response.body()?.toMonsterDetail()
+            val monsterDetailResponse = response.body()
                 ?: return Result.failure(Exception("Invalid response format"))
 
-            // Сохраняем в БД для будущих запросов
+            val monsterDetail = monsterDetailResponse.toMonsterDetail()
+
+            // Сохраняем в базу
             monsterDao.insertMonster(monsterDetail.toMonsterEntity())
-            Log.d(TAG, "Saved monster to local database")
+            Log.d(TAG, "Saved monster to local database after API fetch")
 
             Result.success(monsterDetail)
         } catch (e: Exception) {
@@ -89,6 +88,7 @@ class MonsterRepositoryImpl @Inject constructor(
             Result.failure(e)
         }
     }
+
 
     override fun getFavoriteMonsters(): Flow<List<Monster>> {
         return monsterDao.getFavoriteMonsters()

@@ -15,15 +15,28 @@ class GlideImageLoader @Inject constructor(
     private val context: Context
 ) : ImageLoader {
     override fun loadImage(url: String?, imageView: ImageView) {
+        val fullUrl = when {
+            url.isNullOrEmpty() -> null
+            url.startsWith("/") -> "https://www.dnd5eapi.co$url"
+            else -> url
+        }
+
         Glide.with(context)
-            .load(url)
-            .error(R.drawable.ic_error) // Добавить placeholder для ошибок
+            .load(fullUrl)
+            .placeholder(R.drawable.ic_loading_placeholder)
+            .error(R.drawable.ic_error)
             .into(imageView)
     }
 
     override fun loadImageWithPlaceholder(url: String?, imageView: ImageView, placeholder: Int) {
+        val fullUrl = when {
+            url.isNullOrEmpty() -> null
+            url.startsWith("/") -> "https://www.dnd5eapi.co$url"
+            else -> url
+        }
+
         Glide.with(context)
-            .load(url ?: R.drawable.ic_empty_placeholder) // Обработка null
+            .load(fullUrl)
             .placeholder(placeholder)
             .error(R.drawable.ic_error)
             .into(imageView)
